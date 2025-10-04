@@ -1,0 +1,46 @@
+
+cd C:\Users\zenwa\VR
+@"
+# --- Dependencies ---
+node_modules/
+
+# --- Build outputs ---
+dist/
+build/
+.esbuild/
+vite.svg
+.vite/
+.next/
+.out/
+
+# --- Env & secrets ---
+
+
+# --- Logs & caches ---
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+*.log.*
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# --- Test coverage ---
+coverage/
+.nyc_output/
+
+# --- Editors/OS ---
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# --- Misc ---
+*.local
+*.pid
+*.pid.lock
+*.tgz
+"@ | Out-File -FilePath .gitignore -Encoding utf8
