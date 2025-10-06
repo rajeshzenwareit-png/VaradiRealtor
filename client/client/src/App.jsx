@@ -15,8 +15,12 @@ import BlogDetails from "./components/BlogDetails";
 import ListingCard from './components/ListingCard';
 import ProjectDetails from "./components/ProjectDetails";
 import BloShowgDetails from "./components/BlogDetails";
-
 import Dashboard from "./components/AdminDashboard/Dashboard";
+import AdminProperties from './components/AdminDashboard/AdminProperties';
+import AdminProjects from './components/AdminDashboard/AdminProjects';
+import AdminFeatures from './components/AdminDashboard/AdminFeatures';
+import AdminFacilities from './components/AdminDashboard/AdminFacilities';
+import AdminInvestors from './components/AdminDashboard/AdminInvestors';
 
 
 export default function App() {
@@ -40,6 +44,11 @@ export default function App() {
           <Route path="/listings" element={<ListingsGrid />} />
           <Route path='/card' element={<ListingCard/>}/>
           <Route path='/admin' element={<Dashboard/>}/>
+          <Route path="/admin/Adminproperties" element={<AdminProperties />} />
+          <Route path='/admin/Adminprojects' element={<AdminProjects/>}/>
+          <Route path='/admin/Adminfeatures' element={<AdminFeatures/>}/>
+          <Route path='/admin/Adminfacilities' element={<AdminFacilities/>}/>
+          <Route path='/admin/Admininvestor' element={<AdminInvestors/>}/>
         </Routes>
       </main>
     </div>
