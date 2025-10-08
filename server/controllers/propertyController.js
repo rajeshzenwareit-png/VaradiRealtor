@@ -1,7 +1,7 @@
 // controllers/properties.js
 import Property from "../models/Property.js";
 
-// GET all properties
+// GET all properties (unchanged)
 export const getProperties = async (req, res) => {
   try {
     const {
@@ -14,14 +14,14 @@ export const getProperties = async (req, res) => {
       maxPrice,
       hasVideo,
 
-      // ✅ NEW filters
+      // ✅ existing filters
       category_type,  // preferred (matches schema)
       category,       // alias
       square,
       minSquare,
       maxSquare,
 
-      // ✅ NEW location hierarchy filters
+      // ✅ location hierarchy filters
       country,
       stateName,
       city,
@@ -88,7 +88,7 @@ export const getProperties = async (req, res) => {
       }
     }
 
-    // ✅ NEW: country, stateName, city filters
+    // ✅ country / state / city
     if (country) filter.country = new RegExp(country, "i");
     if (stateName) filter.stateName = new RegExp(stateName, "i");
     if (city) filter.city = new RegExp(city, "i");
@@ -107,7 +107,7 @@ export const getProperties = async (req, res) => {
   }
 };
 
-// GET property by ID
+// GET property by ID (unchanged)
 export const getPropertyById = async (req, res) => {
   try {
     const prop = await Property.findById(req.params.id);
@@ -118,7 +118,7 @@ export const getPropertyById = async (req, res) => {
   }
 };
 
-// CREATE property
+// CREATE property (only added brochure fields)
 export const createProperty = async (req, res) => {
   try {
     const {
@@ -133,13 +133,17 @@ export const createProperty = async (req, res) => {
       amenities,
       videoUrl,
 
-      // ✅ NEW fields
+      // ✅ new fields
       square,
       category_type,
       category, // alias
       country,
       stateName,
-      city
+      city,
+
+      // ✅ NEW brochure fields
+      brochureUrl,
+      brochureFileName,
     } = req.body;
 
     const newProperty = new Property({
@@ -153,7 +157,7 @@ export const createProperty = async (req, res) => {
       rating,
       amenities: Array.isArray(amenities) ? amenities : [],
 
-      // ✅ NEW fields
+      // ✅ new fields
       square: typeof square === "number" ? square : (square ? Number(String(square).replace(/,/g, "")) : undefined),
       category_type: (category_type ?? category)?.toString().trim() || undefined,
       country: country?.toString().trim(),
@@ -161,7 +165,11 @@ export const createProperty = async (req, res) => {
       city: city?.toString().trim(),
 
       // sanitize video
-      videoUrl: typeof videoUrl === "string" ? videoUrl.trim() : undefined
+      videoUrl: typeof videoUrl === "string" ? videoUrl.trim() : undefined,
+
+      // ✅ NEW brochure fields
+      brochureUrl: typeof brochureUrl === "string" ? brochureUrl.trim() : undefined,
+      brochureFileName: typeof brochureFileName === "string" ? brochureFileName.trim() : undefined,
     });
 
     await newProperty.save();
@@ -171,7 +179,7 @@ export const createProperty = async (req, res) => {
   }
 };
 
-// UPDATE property
+// UPDATE property (only added brochure normalization)
 export const updateProperty = async (req, res) => {
   try {
     const updateDoc = { ...req.body };
@@ -200,7 +208,7 @@ export const updateProperty = async (req, res) => {
       updateDoc.square = Number.isNaN(n) ? undefined : n;
     }
 
-    // ✅ normalize new location fields
+    // ✅ normalize location fields
     if ("country" in updateDoc && typeof updateDoc.country === "string") {
       updateDoc.country = updateDoc.country.trim();
     }
@@ -209,6 +217,18 @@ export const updateProperty = async (req, res) => {
     }
     if ("city" in updateDoc && typeof updateDoc.city === "string") {
       updateDoc.city = updateDoc.city.trim();
+    }
+
+    // ✅ NEW: brochure fields
+    if ("brochureUrl" in updateDoc) {
+      if (typeof updateDoc.brochureUrl === "string") {
+        updateDoc.brochureUrl = updateDoc.brochureUrl.trim();
+      } else if (updateDoc.brochureUrl == null) {
+        updateDoc.brochureUrl = "";
+      }
+    }
+    if ("brochureFileName" in updateDoc && typeof updateDoc.brochureFileName === "string") {
+      updateDoc.brochureFileName = updateDoc.brochureFileName.trim();
     }
 
     const updated = await Property.findByIdAndUpdate(

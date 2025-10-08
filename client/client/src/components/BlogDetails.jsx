@@ -13,6 +13,7 @@ const BlogDetails = () => {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -27,6 +28,7 @@ const BlogDetails = () => {
 
           setPost(selected);
           setOtherPosts(rest);
+          console.log('Im fetching data from backend',otherPosts)
         }
       } catch (e) {
         if (!cancelled) setErr(e?.message || "Failed to load");
@@ -43,6 +45,8 @@ const BlogDetails = () => {
   if (loading) return <p className="p-6">Loading...</p>;
   if (err) return <p className="p-6 text-red-500">{err}</p>;
   if (!post) return <p className="p-6">Post not found</p>;
+
+  
 
   return (
     <div className="bg-gray-100 min-h-screen w-full">

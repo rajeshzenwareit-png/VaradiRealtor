@@ -311,12 +311,15 @@ const properties = [
     price: 6500000,
     bedrooms: 3,
     propertyType: "Apartment",
-    images: ["/images/one.jpg"],
+    images: ["/images/agastya.jpg"],
     rating: 4.5,
     amenities: ["Lift", "Power Backup", "Car Parking", "24x7 Security"],
     videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     square: 1450,
     category_type: "Sale",
+    brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
+    // brochureFileName: "bodagalatownshiplayoutvenkatagiri.pdf",
+
   },
   {
     title: "2BHK For Rent near Kapila Teertham",
@@ -329,12 +332,13 @@ const properties = [
     price: 18000,
     bedrooms: 2,
     propertyType: "Apartment",
-    images: ["/images/two.jpg"],
+    images: ["/images/ecogreen.jpg"],
     rating: 4.1,
     amenities: ["Lift", "RO Water", "CCTV"],
     videoUrl: "",
     square: 950,
     category_type: "Rent",
+    brochureUrl: "/images/HARE_RAMA_GREEN_CITY_MARKING_PLOTS_ARE_COMPLETED_Nagari.pdf",
   },
   {
     title: "Luxury Villa with Private Garden",
@@ -347,12 +351,13 @@ const properties = [
     price: 28500000,
     bedrooms: 4,
     propertyType: "Villa",
-    images: ["/images/three.jpg"],
+    images: ["/images/image.png"],
     rating: 4.8,
     amenities: ["Clubhouse", "Pool", "Gym", "EV Charging"],
     videoUrl: "https://www.youtube.com/watch?v=FA6mSHPM5z8&list=PLUs62aqkjy8lFWZON72434Sf4kXVAHdzk&index=8",
     square: 3200,
     category_type: "Residential",
+    brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
   },
   {
     title: "Commercial Space on MG Road",
@@ -365,12 +370,13 @@ const properties = [
     price: 350000,
     bedrooms: 2,
     propertyType: "Commercial property",
-    images: ["/images/four.jpg"],
+    images: ["/images/s.jpg"],
     rating: 4.2,
     amenities: ["Power Backup", "Visitor Parking"],
     videoUrl: "",
     square: 2200,
     category_type: "Commercial",
+    brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
   },
   {
     title: "Independent House near Leela Mahal Circle",
@@ -389,6 +395,7 @@ const properties = [
     videoUrl: "",
     square: 1800,
     category_type: "Sale",
+    brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
   },
   {
     title: "Plug & Play Office",
@@ -407,6 +414,7 @@ const properties = [
     videoUrl: "",
     square: 1400,
     category_type: "Lease",
+    brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
   },
   {
     title: "RERA Approved Condo",
@@ -425,6 +433,7 @@ const properties = [
     videoUrl: "",
     square: 1600,
     category_type: "Residential",
+    brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
   },
   {
     title: "Premium Plot in Gated Layout",
@@ -443,6 +452,7 @@ const properties = [
     videoUrl: "",
     square: 2400,
     category_type: "Sale",
+    brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
   },
   {
     title: "Studio Apartment near IT Park",
@@ -461,6 +471,7 @@ const properties = [
     videoUrl: "",
     square: 520,
     category_type: "Rent",
+    brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
   },
 ];
 

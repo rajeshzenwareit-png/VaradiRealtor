@@ -358,12 +358,22 @@ const ProjectDetails = () => {
                 <FiShare2 /> Share
               </button>
               <button
-                type="button"
-                onClick={handleDownload}
-                className="inline-flex items-center justify-center gap-2 bg-rose-600 text-white px-4 py-2 rounded-lg hover:bg-rose-700"
-              >
-                <FiDownload /> Download
-              </button>
+  type="button"
+  onClick={handleDownload ? handleDownload : undefined}
+  disabled={!handleDownload}
+  title={handleDownload ? "Download brochure" : "No brochure existed"}
+  className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+    ${handleDownload
+      ? "bg-rose-600 text-white hover:bg-rose-700"
+      : "bg-slate-300 text-slate-500 cursor-not-allowed"}`}
+>
+  <FiDownload />
+  <span>Download</span>
+</button>
+
+{!handleDownload && (
+  <p className="mt-2 text-sm text-rose-600">No brochure existed</p>
+)}
             </div>
           </div>
 

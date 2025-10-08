@@ -84,18 +84,36 @@ export default function ListingCard({ property = {} }) {
 
   // Download brochure
   const handleDownload = () => {
-    const url = property?.brochureUrl || property?.pdf || property?.fileUrl;
-    if (!url) {
-      alert("No brochure available to download.");
-      return;
+  // prefer brochureUrl + brochureFileName from your model
+  let url = property?.brochureUrl?.trim() || property?.pdf || property?.fileUrl;
+  if (!url) {
+    alert("No brochure available to download.");
+    return;
+  }
+
+  // If it's a relative path (e.g., /images/file.pdf), make sure it's URI-safe
+  if (url.startsWith("/")) url = encodeURI(url);
+
+  // Nice filename: use brochureFileName if provided, else derive from URL
+  const fallbackName = (() => {
+    try {
+      const last = url.split("?")[0].split("/").pop() || "brochure.pdf";
+      return decodeURIComponent(last);
+    } catch {
+      return "brochure.pdf";
     }
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  };
+  })();
+  const fileName =
+    (property?.brochureFileName && property.brochureFileName.trim()) ||
+    fallbackName;
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = fileName; // ← use your model’s filename or derived one
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+};
 
   return (
     <>
@@ -356,10 +374,23 @@ export default function ListingCard({ property = {} }) {
                         <button type="button" onClick={handleShare} className="inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold bg-sky-600 text-white hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
                           <FiShare2 className="text-base" /> Share
                         </button>
+                        <button
+  type="button"
+  onClick={handleDownload ? handleDownload : undefined}
+  disabled={!handleDownload}
+  title={handleDownload ? "Download brochure" : "No brochure existed"}
+  className={`inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
+    ${handleDownload
+      ? "bg-rose-600 text-white hover:bg-rose-700"
+      : "bg-slate-300 text-slate-500 cursor-not-allowed"}`}
+>
+  <FiDownload />
+  <span>Download</span>
+</button>
 
-                        <button type="button" onClick={handleDownload} className="inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold bg-rose-600 text-white hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-rose-500">
-                          <FiDownload className="text-base" /> Download
-                        </button>
+{!handleDownload && (
+  <p className="mt-2 text-sm text-rose-600">No brochure existed</p>
+)}
                       </div>
                     </div>
 
@@ -380,19 +411,6 @@ export default function ListingCard({ property = {} }) {
 
                   {/* LEFT: Rest of details */}
                   <div className="lg:col-span-2 space-y-6">
-                    {/* Description */}
-                    {/* <div className="rounded-2xl border border-gray-200 mt-2">
-                      <div className="px-4 sm:px-5 py-3 border-b border-gray-200">
-                        <h3 className="font-semibold">Description</h3>
-                      </div>
-                      <div className="p-4 sm:p-5 text-justify">
-                        <p className="text-gray-700 leading-relaxed whitespace-pre-line text-justify">
-                          {property?.description || "No description available."}
-                        </p>
-                      </div>
-                    </div> */}
-
-                    {/* Details & Features — place this ABOVE Description */}
 <div className="rounded-2xl border border-gray-200 mt-2">
   <div className="px-4 sm:px-5 py-3 border-b border-gray-200">
     <h3 className="font-semibold">Details &amp; Features</h3>
