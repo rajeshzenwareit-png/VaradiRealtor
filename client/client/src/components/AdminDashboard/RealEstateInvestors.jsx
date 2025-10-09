@@ -1,47 +1,27 @@
 // src/pages/RealEstateInvestors.jsx
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { FiPlus, FiRefreshCw, FiX, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 /* ---------------- Mock API (replace with your backend) ---------------- */
 async function fetchInvestorsAPI() {
   await new Promise((r) => setTimeout(r, 400));
   return [
-    {
-      id: "i1",
-      name: "Anil Kumar",
-      type: "Individual",
-      company: "",
-      email: "anil@example.com",
-      phone: "+91-9876543210",
-      stage: "Committed",
-      amount: 7500000,
-      notes: "Prefers residential projects",
-      joinedDate: "2025-07-01",
-    },
-    {
-      id: "i2",
-      name: "Cavree Capital",
-      type: "Institution",
-      company: "Cavree Capital",
-      email: "funds@cavree.com",
-      phone: "+1-650-555-0100",
-      stage: "Contacted",
-      amount: 0,
-      notes: "Requested deck",
-      joinedDate: "",
-    },
-    {
-      id: "i3",
-      name: "Priya Desai",
-      type: "Individual",
-      company: "",
-      email: "",
-      phone: "",
-      stage: "Lead",
-      amount: 2500000,
+    { id: "i1",  name: "Anil Kumar",    type: "Individual", company: "", email: "anil@example.com", phone: "+91-9876543210", stage: "Committed", amount: 7500000, notes: "Prefers residential projects", joinedDate: "2025-07-01" },
+    { id: "i2",  name: "Cavree Capital", type: "Institution", company: "Cavree Capital", email: "funds@cavree.com", phone: "+1-650-555-0100", stage: "Contacted", amount: 0, notes: "Requested deck", joinedDate: "" },
+    { id: "i3",  name: "Priya Desai",   type: "Individual", company: "", email: "", phone: "", stage: "Lead", amount: 2500000, notes: "", joinedDate: "2025-09-20" },
+    // --- add more mock rows to see pagination working ---
+    ...Array.from({ length: 37 }).map((_, i) => ({
+      id: `ix${i+4}`,
+      name: `Investor ${i+4}`,
+      type: i % 3 === 0 ? "Institution" : "Individual",
+      company: i % 3 === 0 ? `Company ${i+4}` : "",
+      email: i % 2 === 0 ? `user${i+4}@mail.com` : "",
+      phone: i % 4 === 0 ? "+91-9000000000" : "",
+      stage: ["Lead","Contacted","Committed","Inactive"][i % 4],
+      amount: (i % 5 === 0 ? 0 : (i+1) * 100000),
       notes: "",
-      joinedDate: "2025-09-20",
-    },
+      joinedDate: ""
+    }))
   ];
 }
 async function createInvestorAPI(payload) {
@@ -69,6 +49,10 @@ export default function RealEstateInvestors() {
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [deletingIds, setDeletingIds] = useState(new Set());
+
+  // Pagination state
+  const [page, setPage] = useState(1); // 1-based
+  const [pageSize, setPageSize] = useState(10); // options: 5,10,20,50
 
   const [form, setForm] = useState({
     name: "",
@@ -101,6 +85,7 @@ export default function RealEstateInvestors() {
     try {
       const data = await fetchInvestorsAPI();
       setItems(data);
+      setPage(1); // reset to first page on reload
     } catch (e) {
       setError("Failed to load investors. Please try again.");
     } finally {
@@ -138,7 +123,6 @@ export default function RealEstateInvestors() {
     e.preventDefault();
     if (!form.name.trim()) return setError("Name is required.");
 
-    // sanitize
     const payload = {
       ...form,
       amount:
@@ -154,6 +138,7 @@ export default function RealEstateInvestors() {
       } else {
         const created = await createInvestorAPI(payload);
         setItems((prev) => [created, ...prev]);
+        setPage(1); // new item appears on first page (top)
       }
       setDrawerOpen(false);
       setEditingId(null);
@@ -185,6 +170,33 @@ export default function RealEstateInvestors() {
     }
   };
 
+  /* ----------------------------- Pagination ---------------------------- */
+  const total = items.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  // Ensure current page is valid when items or pageSize change
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
+  const pageStart = (page - 1) * pageSize;
+  const pageEnd = Math.min(pageStart + pageSize, total);
+
+  const pagedItems = useMemo(
+    () => items.slice(pageStart, pageEnd),
+    [items, pageStart, pageEnd]
+  );
+
+  function getPageNumbers(current, totalP, max = 5) {
+    const half = Math.floor(max / 2);
+    let start = Math.max(1, current - half);
+    let end = Math.min(totalP, start + max - 1);
+    start = Math.max(1, end - max + 1);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+
+  const pageNumbers = useMemo(() => getPageNumbers(page, totalPages, 5), [page, totalPages]);
+
   const StageBadge = ({ value }) => {
     const v = (value || "").toLowerCase();
     const cls =
@@ -206,6 +218,20 @@ export default function RealEstateInvestors() {
   const money = (n) =>
     n && !isNaN(n) && Number(n) > 0 ? `₹${Number(n).toLocaleString("en-IN")}` : "—";
 
+  const PageButton = ({ children, onClick, disabled, active, title }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`h-9 min-w-9 px-3 rounded-lg border text-sm
+        ${active ? "bg-sky-600 text-white border-sky-600" : "hover:bg-gray-50"}
+        disabled:opacity-50`}
+    >
+      {children}
+    </button>
+  );
+
   return (
     <div className="h-full w-full">
       {/* Header */}
@@ -214,7 +240,25 @@ export default function RealEstateInvestors() {
           <h1 className="text-xl sm:text-2xl font-semibold">Investors</h1>
           <p className="text-sm text-gray-500">Manage investor details and pipeline stage.</p>
         </div>
+
         <div className="flex items-center gap-2 sm:justify-end">
+          {/* Page size selector (kept small, matches your UI) */}
+          <label className="hidden sm:flex items-center gap-2 text-sm text-gray-500 mr-2">
+            <span>Rows:</span>
+            <select
+              className="rounded-lg border px-2 py-1.5"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              {[5, 10, 20, 50].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+
           <button
             onClick={loadItems}
             disabled={loading}
@@ -224,6 +268,7 @@ export default function RealEstateInvestors() {
             <FiRefreshCw className={loading ? "animate-spin" : ""} />
             <span className="hidden xs:inline">Reload</span>
           </button>
+
           <button
             onClick={openCreate}
             className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-3 sm:px-4 py-2 text-white hover:bg-sky-700 active:scale-[.98]"
@@ -255,60 +300,121 @@ export default function RealEstateInvestors() {
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-separate border-spacing-y-2 text-sm">
-                <thead className="bg-white sticky top-0 z-10">
-                  <tr className="text-left text-gray-500">
-                    <th className="px-3 py-2 whitespace-nowrap">Name</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Type</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Company</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Email</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Phone</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Stage</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Committed Amount</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((row) => {
-                    const isDeleting = deletingIds.has(row.id);
-                    return (
-                      <tr key={row.id} className="bg-gray-50 hover:bg-gray-100">
-                        <td className="px-3 py-3 font-medium whitespace-nowrap">{row.name}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{row.type || "—"}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{row.company || "—"}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{row.email || "—"}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{row.phone || "—"}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <StageBadge value={row.stage} />
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap">{money(row.amount)}</td>
-                        <td className="px-3 py-3">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => openEdit(row)}
-                              className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100"
-                              title="Edit"
-                            >
-                              <FiEdit2 /> <span className="hidden sm:inline">Edit</span>
-                            </button>
-                            <button
-                              onClick={() => handleDelete(row.id)}
-                              disabled={isDeleting}
-                              className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100 disabled:opacity-50"
-                              title="Delete"
-                            >
-                              <FiTrash2 />{" "}
-                              <span className="hidden sm:inline">{isDeleting ? "Deleting…" : "Delete"}</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-separate border-spacing-y-2 text-sm">
+                  <thead className="bg-white sticky top-0 z-10">
+                    <tr className="text-left text-gray-500">
+                      <th className="px-3 py-2 whitespace-nowrap">Name</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Type</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Company</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Email</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Phone</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Stage</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Committed Amount</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pagedItems.map((row) => {
+                      const isDeleting = deletingIds.has(row.id);
+                      return (
+                        <tr key={row.id} className="bg-gray-50 hover:bg-gray-100">
+                          <td className="px-3 py-3 font-medium whitespace-nowrap">{row.name}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">{row.type || "—"}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">{row.company || "—"}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">{row.email || "—"}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">{row.phone || "—"}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">
+                            <StageBadge value={row.stage} />
+                          </td>
+                          <td className="px-3 py-3 whitespace-nowrap">{money(row.amount)}</td>
+                          <td className="px-3 py-3">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => openEdit(row)}
+                                className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100"
+                                title="Edit"
+                              >
+                                <FiEdit2 /> <span className="hidden sm:inline">Edit</span>
+                              </button>
+                              <button
+                                onClick={() => handleDelete(row.id)}
+                                disabled={isDeleting}
+                                className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100 disabled:opacity-50"
+                                title="Delete"
+                              >
+                                <FiTrash2 />{" "}
+                                <span className="hidden sm:inline">{isDeleting ? "Deleting…" : "Delete"}</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination footer */}
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm text-gray-600">
+                  Showing <span className="font-medium">{total === 0 ? 0 : pageStart + 1}</span>–
+                  <span className="font-medium">{pageEnd}</span> of <span className="font-medium">{total}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <PageButton
+                    title="First page"
+                    onClick={() => setPage(1)}
+                    disabled={page === 1}
+                  >
+                    «
+                  </PageButton>
+                  <PageButton
+                    title="Previous page"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    ‹
+                  </PageButton>
+
+                  {pageNumbers[0] > 1 && (
+                    <span className="px-1 text-gray-500">…</span>
+                  )}
+
+                  {pageNumbers.map((n) => (
+                    <PageButton
+                      key={n}
+                      title={`Page ${n}`}
+                      onClick={() => setPage(n)}
+                      active={n === page}
+                    >
+                      {n}
+                    </PageButton>
+                  ))}
+
+                  {pageNumbers[pageNumbers.length - 1] < totalPages && (
+                    <span className="px-1 text-gray-500">…</span>
+                  )}
+
+                  <PageButton
+                    title="Next page"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                  >
+                    ›
+                  </PageButton>
+                  <PageButton
+                    title="Last page"
+                    onClick={() => setPage(totalPages)}
+                    disabled={page === totalPages}
+                  >
+                    »
+                  </PageButton>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -344,7 +450,7 @@ export default function RealEstateInvestors() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   required
-                  placeholder="e.g., Anil Kumar"
+                  placeholder="Rajesh"
                 />
               </label>
 

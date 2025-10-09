@@ -1,5 +1,5 @@
 // src/pages/Projects.jsx
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { FiPlus, FiRefreshCw, FiX, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 /** ---- Mock APIs (replace with your backend calls) ---- */
@@ -35,6 +35,10 @@ export default function RealEstateProjects() {
   const [editingId, setEditingId] = useState(null); // null = create, string = edit id
   const [deletingIds, setDeletingIds] = useState(new Set());
 
+  // Pagination state
+  const [page, setPage] = useState(1);       // 1-based
+  const [pageSize, setPageSize] = useState(10); // 5,10,20,50
+
   const [form, setForm] = useState({
     name: "",
     client: "",
@@ -62,6 +66,7 @@ export default function RealEstateProjects() {
     try {
       const data = await fetchProjectsAPI();
       setProjects(data);
+      setPage(1); // reset page on reload
     } catch (e) {
       setError("Failed to load projects. Please try again.");
     } finally {
@@ -108,6 +113,7 @@ export default function RealEstateProjects() {
       } else {
         const created = await createProjectAPI(form);
         setProjects((prev) => [created, ...prev]);
+        setPage(1); // new row appears on page 1
       }
       setDrawerOpen(false);
       setEditingId(null);
@@ -140,6 +146,56 @@ export default function RealEstateProjects() {
     }
   };
 
+  /* ----------------------------- Pagination ---------------------------- */
+  const total = projects.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
+  const pageStart = (page - 1) * pageSize;
+  const pageEnd = Math.min(pageStart + pageSize, total);
+
+  const pagedProjects = useMemo(
+    () => projects.slice(pageStart, pageEnd),
+    [projects, pageStart, pageEnd]
+  );
+
+  function getPageNumbers(current, totalP, max = 5) {
+    const half = Math.floor(max / 2);
+    let start = Math.max(1, current - half);
+    let end = Math.min(totalP, start + max - 1);
+    start = Math.max(1, end - max + 1);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+  const pageNumbers = useMemo(() => getPageNumbers(page, totalPages, 5), [page, totalPages]);
+
+  const money = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? `₹${n.toLocaleString("en-IN")}` : "—";
+  };
+
+  const StatusBadge = ({ value }) => (
+    <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs">
+      {value || "—"}
+    </span>
+  );
+
+  const PageButton = ({ children, onClick, disabled, active, title }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`h-9 min-w-9 px-3 rounded-lg border text-sm
+        ${active ? "bg-sky-600 text-white border-sky-600" : "hover:bg-gray-50"}
+        disabled:opacity-50`}
+    >
+      {children}
+    </button>
+  );
+
   return (
     <div className="h-full w-full">
       {/* Header + actions */}
@@ -149,6 +205,23 @@ export default function RealEstateProjects() {
           <p className="text-sm text-gray-500">Manage your projects and create new ones.</p>
         </div>
         <div className="flex items-center gap-2 sm:justify-end">
+          {/* Page size selector */}
+          <label className="hidden sm:flex items-center gap-2 text-sm text-gray-500 mr-2">
+            <span>Rows:</span>
+            <select
+              className="rounded-lg border px-2 py-1.5"
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              {[5, 10, 20, 50].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </label>
+
           <button
             onClick={loadProjects}
             disabled={loading}
@@ -188,60 +261,84 @@ export default function RealEstateProjects() {
               </button>
             </div>
           ) : (
-            /* One responsive table (headers visible on mobile via horizontal scroll) */
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-separate border-spacing-y-2 text-sm">
-                <thead className="bg-white sticky top-0 z-10">
-                  <tr className="text-left text-gray-500">
-                    <th className="px-3 py-2 whitespace-nowrap">Name</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Client</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Status</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Start</th>
-                    <th className="px-3 py-2 whitespace-nowrap">End</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Budget</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {projects.map((p) => {
-                    const isDeleting = deletingIds.has(p.id);
-                    return (
-                      <tr key={p.id} className="bg-gray-50 hover:bg-gray-100">
-                        <td className="px-3 py-3 font-medium whitespace-nowrap">{p.name}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{p.client || "—"}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs">
-                            {p.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap">{p.startDate || "—"}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{p.endDate || "—"}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">{p.budget ? `₹${p.budget}` : "—"}</td>
-                        <td className="px-3 py-3">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => openEdit(p)}
-                              className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100"
-                              title="Edit"
-                            >
-                              <FiEdit2 /> <span className="hidden sm:inline">Edit</span>
-                            </button>
-                            <button
-                              onClick={() => handleDelete(p.id)}
-                              disabled={isDeleting}
-                              className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100 disabled:opacity-50"
-                              title="Delete"
-                            >
-                              <FiTrash2 /> <span className="hidden sm:inline">{isDeleting ? "Deleting…" : "Delete"}</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-separate border-spacing-y-2 text-sm">
+                  <thead className="bg-white sticky top-0 z-10">
+                    <tr className="text-left text-gray-500">
+                      <th className="px-3 py-2 whitespace-nowrap">Name</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Client</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Status</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Start</th>
+                      <th className="px-3 py-2 whitespace-nowrap">End</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Budget</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pagedProjects.map((p) => {
+                      const isDeleting = deletingIds.has(p.id);
+                      return (
+                        <tr key={p.id} className="bg-gray-50 hover:bg-gray-100">
+                          <td className="px-3 py-3 font-medium whitespace-nowrap">{p.name}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">{p.client || "—"}</td>
+                          <td className="px-3 py-3 whitespace-nowrap"><StatusBadge value={p.status} /></td>
+                          <td className="px-3 py-3 whitespace-nowrap">{p.startDate || "—"}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">{p.endDate || "—"}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">{money(p.budget)}</td>
+                          <td className="px-3 py-3">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => openEdit(p)}
+                                className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100"
+                                title="Edit"
+                              >
+                                <FiEdit2 /> <span className="hidden sm:inline">Edit</span>
+                              </button>
+                              <button
+                                onClick={() => handleDelete(p.id)}
+                                disabled={isDeleting}
+                                className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100 disabled:opacity-50"
+                                title="Delete"
+                              >
+                                <FiTrash2 />{" "}
+                                <span className="hidden sm:inline">{isDeleting ? "Deleting…" : "Delete"}</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination footer */}
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm text-gray-600">
+                  Showing <span className="font-medium">{total === 0 ? 0 : pageStart + 1}</span>–
+                  <span className="font-medium">{pageEnd}</span> of <span className="font-medium">{total}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <PageButton title="First page" onClick={() => setPage(1)} disabled={page === 1}>«</PageButton>
+                  <PageButton title="Previous page" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>‹</PageButton>
+
+                  {pageNumbers[0] > 1 && <span className="px-1 text-gray-500">…</span>}
+
+                  {pageNumbers.map((n) => (
+                    <PageButton key={n} title={`Page ${n}`} onClick={() => setPage(n)} active={n === page}>
+                      {n}
+                    </PageButton>
+                  ))}
+
+                  {pageNumbers[pageNumbers.length - 1] < totalPages && <span className="px-1 text-gray-500">…</span>}
+
+                  <PageButton title="Next page" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>›</PageButton>
+                  <PageButton title="Last page" onClick={() => setPage(totalPages)} disabled={page === totalPages}>»</PageButton>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>

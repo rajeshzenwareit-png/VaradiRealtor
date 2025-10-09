@@ -25,6 +25,7 @@ import RealEstateInvestors from './components/AdminDashboard/RealEstateInvestors
 import RealEstateFacilities from './components/AdminDashboard/RealEstateFacilities';
 import RealEstateCategories from './components/AdminDashboard/RealEstateCategories';
 import RealEstateCustomeFields from './components/AdminDashboard/RealEstateCustomeFields';
+import Pages from './components/AdminDashboard/Pages';
 
 
 
@@ -57,6 +58,7 @@ export default function App() {
           <Route path="/card" element={<ListingCard />} />
 
 
+           {/* Admin Routes */}
             <Route path="/admin" element={<AdminShell />}>
             <Route path="real-estate/properties" element={<RealEstateProperties />} />
             <Route path='real-estate/projects' element = {<RealEstateProjects/>}/>
@@ -65,6 +67,7 @@ export default function App() {
             <Route path='real-estate/facilities' element = {<RealEstateFacilities/>} />
             <Route path='real-estate/categories' element = {<RealEstateCategories/>} />
             <Route path='real-estate/custom-fields' element = {<RealEstateCustomeFields/>} />
+            <Route path='pages' element = {<Pages/>}/>
           </Route>
         </Routes>
       </main>
