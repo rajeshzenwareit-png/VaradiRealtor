@@ -13,7 +13,7 @@ const writeStore = (data) => {
 
 /* ------------------------------ Utils -------------------------------- */
 const BASE_URL = "https://www.tirupatirealestates.com/en/";
-const slugify = (s="") =>
+const slugify = (s = "") =>
   s.toString().trim().toLowerCase()
     .replace(/['"]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
@@ -39,7 +39,11 @@ export default function Pages() {
   const [editingId, setEditingId] = useState(null);
   const [deletingIds, setDeletingIds] = useState(new Set());
 
-  /* form state — mirrors RealEstateProjects style */
+  /* -------- PAGINATION (same style as Projects) -------- */
+  const [page, setPage] = useState(1);   // 1-based
+  const pageSize = 10;                   // fixed (no selector)
+
+  /* form state */
   const [form, setForm] = useState({
     name: "",
     slug: "",
@@ -76,13 +80,14 @@ export default function Pages() {
       imageDataUrl: "",
     });
 
-  /* Load list (like fetchProjectsAPI) */
+  /* Load list */
   const loadPages = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const data = readStore();
       setItems(data);
+      setPage(1); // match Projects: reset to first on reload
     } catch {
       setError("Failed to load pages. Please try again.");
     } finally {
@@ -90,16 +95,15 @@ export default function Pages() {
     }
   }, []);
 
-  useEffect(() => {
-    loadPages();
-  }, [loadPages]);
+  useEffect(() => { loadPages(); }, [loadPages]);
 
-  /* Drawer openers (same pattern as Projects) */
+  /* Drawer openers */
+  const editorRef = useRef(null);
+
   const openCreate = () => {
     setEditingId(null);
     resetForm();
     setDrawerOpen(true);
-    // reset editor content
     if (editorRef.current) editorRef.current.innerHTML = "<p>Start typing your content…</p>";
   };
 
@@ -162,6 +166,7 @@ export default function Pages() {
       setDrawerOpen(false);
       setEditingId(null);
       resetForm();
+      if (!exists) setPage(1); // show new item on first page
     } catch {
       setError(editingId ? "Failed to update page." : "Failed to create page.");
     } finally {
@@ -169,7 +174,7 @@ export default function Pages() {
     }
   };
 
-  /* Delete (optimistic like Projects) */
+  /* Delete (optimistic) */
   const handleDelete = async (id) => {
     if (!confirm("Delete this page?")) return;
     setDeletingIds((s) => new Set(s).add(id));
@@ -196,8 +201,7 @@ export default function Pages() {
     return BASE_URL + (slug ? `${slug}/` : "");
   }, [form.slug, form.name]);
 
-  /* Simple rich-text (matches input styling + compact toolbar) */
-  const editorRef = useRef(null);
+  /* Simple rich-text */
   const exec = (cmd, val = null) => {
     document.execCommand(cmd, false, val);
     setForm((f) => ({ ...f, contentHtml: editorRef.current?.innerHTML || "" }));
@@ -212,9 +216,49 @@ export default function Pages() {
     setForm((f) => ({ ...f, [key]: dataUrl }));
   };
 
+  /* ----------------------------- Pagination (same as Projects) ---------------------------- */
+  const total = items.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
+  const pageStart = (page - 1) * pageSize;
+  const pageEnd = Math.min(pageStart + pageSize, total);
+
+  const pageItems = useMemo(
+    () => items.slice(pageStart, pageEnd),
+    [items, pageStart, pageEnd]
+  );
+
+  // identical helper to Projects.jsx
+  function getPageNumbers(current, totalP, max = 5) {
+    const half = Math.floor(max / 2);
+    let start = Math.max(1, current - half);
+    let end = Math.min(totalP, start + max - 1);
+    start = Math.max(1, end - max + 1);
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  }
+  const pageNumbers = useMemo(() => getPageNumbers(page, totalPages, 5), [page, totalPages]);
+
+  const PageButton = ({ children, onClick, disabled, active, title }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      title={title}
+      className={`h-9 min-w-9 px-3 rounded-lg border text-sm
+        ${active ? "bg-sky-600 text-white border-sky-600" : "hover:bg-gray-50"}
+        disabled:opacity-50`}
+    >
+      {children}
+    </button>
+  );
+
   return (
     <div className="h-full w-full">
-      {/* Header + actions (same as Projects) */}
+      {/* Header + actions */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between mb-4">
         <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl font-semibold">Pages</h1>
@@ -241,7 +285,7 @@ export default function Pages() {
         </div>
       </div>
 
-      {/* Table (same table style as Projects) */}
+      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
         <div className="p-3 sm:p-4">
           {error && (
@@ -260,67 +304,121 @@ export default function Pages() {
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-separate border-spacing-y-2 text-sm">
-                <thead className="bg-white sticky top-0 z-10">
-                  <tr className="text-left text-gray-500">
-                    <th className="px-3 py-2 whitespace-nowrap">Name</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Permalink</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Status</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Template</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Updated</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((p) => {
-                    const isDeleting = deletingIds.has(p.id);
-                    return (
-                      <tr key={p.id} className="bg-gray-50 hover:bg-gray-100">
-                        <td className="px-3 py-3 font-medium whitespace-nowrap">{p.name}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <span className="text-xs text-gray-600">{BASE_URL}{p.slug}/</span>
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs">
-                            {p.status}
-                          </span>
-                        </td>
-                        <td className="px-3 py-3 whitespace-nowrap">{p.template}</td>
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          {p.updatedAt ? new Date(p.updatedAt).toLocaleString() : "—"}
-                        </td>
-                        <td className="px-3 py-3">
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => openEdit(p)}
-                              className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100"
-                              title="Edit"
-                            >
-                              <FiEdit2 /> <span className="hidden sm:inline">Edit</span>
-                            </button>
-                            <button
-                              onClick={() => handleDelete(p.id)}
-                              disabled={isDeleting}
-                              className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100 disabled:opacity-50"
-                              title="Delete"
-                            >
-                              <FiTrash2 />{" "}
-                              <span className="hidden sm:inline">{isDeleting ? "Deleting…" : "Delete"}</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <>
+              {/* Top pagination (same UI as Projects) */}
+              <div className="mt-1 mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm text-gray-600">
+                  Showing <span className="font-medium">{total === 0 ? 0 : pageStart + 1}</span>–
+                  <span className="font-medium">{pageEnd}</span> of <span className="font-medium">{total}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <PageButton title="First page" onClick={() => setPage(1)} disabled={page === 1}>«</PageButton>
+                  <PageButton title="Previous page" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>‹</PageButton>
+
+                  {pageNumbers[0] > 1 && <span className="px-1 text-gray-500">…</span>}
+
+                  {pageNumbers.map((n) => (
+                    <PageButton key={n} title={`Page ${n}`} onClick={() => setPage(n)} active={n === page}>
+                      {n}
+                    </PageButton>
+                  ))}
+
+                  {pageNumbers[pageNumbers.length - 1] < totalPages && <span className="px-1 text-gray-500">…</span>}
+
+                  <PageButton title="Next page" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>›</PageButton>
+                  <PageButton title="Last page" onClick={() => setPage(totalPages)} disabled={page === totalPages}>»</PageButton>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="min-w-full border-separate border-spacing-y-2 text-sm">
+                  <thead className="bg-white sticky top-0 z-10">
+                    <tr className="text-left text-gray-500">
+                      <th className="px-3 py-2 whitespace-nowrap">Name</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Permalink</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Status</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Template</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Updated</th>
+                      <th className="px-3 py-2 whitespace-nowrap">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pageItems.map((p) => {
+                      const isDeleting = deletingIds.has(p.id);
+                      return (
+                        <tr key={p.id} className="bg-gray-50 hover:bg-gray-100">
+                          <td className="px-3 py-3 font-medium whitespace-nowrap">{p.name}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">
+                            <span className="text-xs text-gray-600">{BASE_URL}{p.slug}/</span>
+                          </td>
+                          <td className="px-3 py-3 whitespace-nowrap">
+                            <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs">
+                              {p.status}
+                            </span>
+                          </td>
+                          <td className="px-3 py-3 whitespace-nowrap">{p.template}</td>
+                          <td className="px-3 py-3 whitespace-nowrap">
+                            {p.updatedAt ? new Date(p.updatedAt).toLocaleString() : "—"}
+                          </td>
+                          <td className="px-3 py-3">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => openEdit(p)}
+                                className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100"
+                                title="Edit"
+                              >
+                                <FiEdit2 /> <span className="hidden sm:inline">Edit</span>
+                              </button>
+                              <button
+                                onClick={() => handleDelete(p.id)}
+                                disabled={isDeleting}
+                                className="inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 hover:bg-gray-100 disabled:opacity-50"
+                                title="Delete"
+                              >
+                                <FiTrash2 />{" "}
+                                <span className="hidden sm:inline">{isDeleting ? "Deleting…" : "Delete"}</span>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Bottom pagination (same UI as Projects) */}
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="text-sm text-gray-600">
+                  Showing <span className="font-medium">{total === 0 ? 0 : pageStart + 1}</span>–
+                  <span className="font-medium">{pageEnd}</span> of <span className="font-medium">{total}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <PageButton title="First page" onClick={() => setPage(1)} disabled={page === 1}>«</PageButton>
+                  <PageButton title="Previous page" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>‹</PageButton>
+
+                  {pageNumbers[0] > 1 && <span className="px-1 text-gray-500">…</span>}
+
+                  {pageNumbers.map((n) => (
+                    <PageButton key={n} title={`Page ${n}`} onClick={() => setPage(n)} active={n === page}>
+                      {n}
+                    </PageButton>
+                  ))}
+
+                  {pageNumbers[pageNumbers.length - 1] < totalPages && <span className="px-1 text-gray-500">…</span>}
+
+                  <PageButton title="Next page" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages}>›</PageButton>
+                  <PageButton title="Last page" onClick={() => setPage(totalPages)} disabled={page === totalPages}>»</PageButton>
+                </div>
+              </div>
+            </>
           )}
         </div>
       </div>
 
-      {/* Drawer (form UI copied from Projects style) */}
+      {/* Drawer (form) */}
       <div className={`fixed inset-0 z-50 ${drawerOpen ? "" : "pointer-events-none"}`} aria-hidden={!drawerOpen}>
         {/* Backdrop */}
         <button
@@ -434,7 +532,7 @@ export default function Pages() {
               </div>
             </div>
 
-            {/* SEO Section (styled like other inputs) */}
+            {/* SEO Section */}
             <div className="rounded-2xl border p-3 sm:p-4">
               <h3 className="font-medium mb-3">Search Engine Optimize</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -570,17 +668,17 @@ export default function Pages() {
               </label>
             </div>
 
-            {/* Previews (compact) */}
+            {/* Previews */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <span className="text-sm text-gray-600">SEO Image Preview</span>
                 <div className="mt-1 border rounded-xl p-2 bg-gray-50">
                   {(form.seoImageUrl || form.seoImageDataUrl) ? (
-                    // eslint-disable-next-line jsx-a11y/alt-text
                     <img
                       src={form.seoImageUrl || form.seoImageDataUrl}
                       className="max-h-40 rounded object-contain bg-white mx-auto"
                       onError={(e) => (e.currentTarget.style.display = "none")}
+                      alt=""
                     />
                   ) : (
                     <div className="h-24 grid place-items-center text-gray-400 text-sm">No image selected</div>
@@ -591,11 +689,11 @@ export default function Pages() {
                 <span className="text-sm text-gray-600">Main Image Preview</span>
                 <div className="mt-1 border rounded-xl p-2 bg-gray-50">
                   {(form.imageUrl || form.imageDataUrl) ? (
-                    // eslint-disable-next-line jsx-a11y/alt-text
                     <img
                       src={form.imageUrl || form.imageDataUrl}
                       className="max-h-40 rounded object-contain bg-white mx-auto"
                       onError={(e) => (e.currentTarget.style.display = "none")}
+                      alt=""
                     />
                   ) : (
                     <div className="h-24 grid place-items-center text-gray-400 text-sm">No image selected</div>
@@ -604,15 +702,11 @@ export default function Pages() {
               </div>
             </div>
 
-            {/* Footer buttons (same as Projects) */}
+            {/* Footer buttons */}
             <div className="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2 pt-2 border-t">
               <button
                 type="button"
-                onClick={() => {
-                  setDrawerOpen(false);
-                  setEditingId(null);
-                  resetForm();
-                }}
+                onClick={() => { setDrawerOpen(false); setEditingId(null); resetForm(); }}
                 className="rounded-xl border px-4 py-2 hover:bg-gray-50"
               >
                 Cancel
@@ -629,7 +723,7 @@ export default function Pages() {
         </div>
       </div>
 
-      {/* Tiny footer to match your text */}
+      {/* Tiny footer */}
       <div className="mt-6 text-center text-xs text-gray-500">
         Copyright 2025 © SLN Developers Tirupati.
       </div>

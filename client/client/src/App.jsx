@@ -15,6 +15,7 @@ import BlogDetails from "./components/BlogDetails";
 import ListingCard from './components/ListingCard';
 import ProjectDetails from "./components/ProjectDetails";
 import BloShowgDetails from "./components/BlogDetails";
+import ScrollToTop from './components/ScrollToTop';
 
 // Admin pages
 import AdminShell from './components/layout/AdminShell';
@@ -26,6 +27,8 @@ import RealEstateFacilities from './components/AdminDashboard/RealEstateFaciliti
 import RealEstateCategories from './components/AdminDashboard/RealEstateCategories';
 import RealEstateCustomeFields from './components/AdminDashboard/RealEstateCustomeFields';
 import Pages from './components/AdminDashboard/Pages';
+import RealEstatePosts from './components/AdminDashboard/Blog/RealEstatePosts';
+
 
 
 
@@ -37,10 +40,10 @@ const AdminCustomFields = () => <div>Custom Fields</div>;
 export default function App() {
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       {/* <Navbar /> */}
       <main className="flex-1 container mx-auto px-1 py-0 max-w-8xl">
         <Routes>
-          
           {/* Public routes (unchanged) */}
           <Route path="/" element={<Home />} />
           <Route path="/properties" element={<Properties />} />
@@ -68,6 +71,7 @@ export default function App() {
             <Route path='real-estate/categories' element = {<RealEstateCategories/>} />
             <Route path='real-estate/custom-fields' element = {<RealEstateCustomeFields/>} />
             <Route path='pages' element = {<Pages/>}/>
+            <Route path='blog/posts' element = {<RealEstatePosts/>}/>
           </Route>
         </Routes>
       </main>
