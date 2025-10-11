@@ -29,8 +29,8 @@ export default function Footer() {
             <div>
               <h4 className="text-lg font-extrabold tracking-tight mb-3">About</h4>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">About Us</a></li>
-                <li><a href="/" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">Contact Us</a></li>
+                <li><a href="/aboutsection" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">About Us</a></li>
+                <li><a href="/contactsection" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">Contact Us</a></li>
                 <li><a href="/" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">Terms &amp; Conditions</a></li>
               </ul>
             </div>
@@ -40,10 +40,10 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-extrabold tracking-tight mb-4">News</h4>
             <ul className="space-y-3 text-sm">
-              <li><a href="/" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">Latest News</a></li>
-              <li><a href="/" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">House Architecture</a></li>
-              <li><a href="/" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">House Design</a></li>
-              <li><a href="/" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">Building Materials</a></li>
+              {/* <li><a href="/" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">Latest News</a></li> */}
+              <li><a href="/properties" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">House Architecture</a></li>
+              <li><a href="/blogsection" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">House Design</a></li>
+              <li><a href="/properties" className="font-semibold text-gray-600 hover:text-sky-600 transition-colors">Building Materials</a></li>
             </ul>
           </div>
 

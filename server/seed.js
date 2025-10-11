@@ -28,12 +28,11 @@ const seed = async () => {
 
     // Sample data
 
-
 const properties = [
   {
     title: "Premium 3BHK Apartment near Alipiri",
     description:
-      "Discover a thoughtfully designed 3BHK apartment nestled near Alipiri, where calm temple views meet everyday convenience...",
+      "A practical 3BHK near Alipiri with a clear, efficient layout for daily living. The living–dining zone supports routine use and small gatherings, while large openings provide daylight and ventilation. The kitchen follows an ergonomic triangle with adequate counters and storage. Three bedrooms allow privacy; the primary fits a king bed and full wardrobes. Bathrooms use durable finishes for easy upkeep. Building features include elevators, common-area CCTV, power backup for essentials, and covered parking. Broadband readiness suits hybrid work. The location connects quickly to schools, groceries, healthcare, and transport. Overall, a low-maintenance apartment in a calm residential pocket with dependable infrastructure.",
     location: "Tirupati, Andhra Pradesh",
     country: "India",
     stateName: "Andhra Pradesh",
@@ -43,18 +42,26 @@ const properties = [
     propertyType: "Apartment",
     images: ["/images/agastya.jpg"],
     rating: 4.5,
-    amenities: ["Lift", "Power Backup", "Car Parking", "24x7 Security"],
+    amenities: [
+      "Lift",
+      "Power Backup",
+      "Car Parking",
+      "24x7 Security",
+      "CCTV Surveillance",
+      "Rainwater Harvesting",
+      "Intercom Facility",
+      "Visitor Parking",
+      "Fire Safety"
+    ],
     videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     square: 1450,
     category_type: "Sale",
     brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
-    // brochureFileName: "bodagalatownshiplayoutvenkatagiri.pdf",
-
   },
   {
     title: "2BHK For Rent near Kapila Teertham",
     description:
-      "Set just minutes from Kapila Teertham, this practical 2BHK rental blends comfort, convenience, and value...",
+      "A well-located 2BHK rental close to Kapila Teertham, prioritising accessibility and value. The living area fits standard seating and a compact work corner. The dining niche adjoins a ventilated kitchen with base/overhead cabinets and practical counter space. Two bedrooms provide flexibility for a primary suite plus a secondary room or office. Bathrooms use easy-clean finishes for predictable maintenance. The building typically offers lift access, secure entry, and common-area CCTV. Water supply and backup for shared services improve daily reliability. Broadband readiness supports remote work. With markets, clinics, schools, and bus stops nearby, commute and errands are efficient—an affordable, low-maintenance home in central Tirupati.",
     location: "Tirupati",
     country: "India",
     stateName: "Andhra Pradesh",
@@ -64,7 +71,17 @@ const properties = [
     propertyType: "Apartment",
     images: ["/images/ecogreen.jpg"],
     rating: 4.1,
-    amenities: ["Lift", "RO Water", "CCTV"],
+    amenities: [
+      "Lift",
+      "RO Water",
+      "CCTV",
+      "24x7 Security",
+      "Covered Two-Wheeler Parking",
+      "Power Backup (Common Areas)",
+      "Visitor Parking",
+      "Waste Segregation",
+      "Intercom"
+    ],
     videoUrl: "https://www.youtube.com/watch?v=Mn6HAAnU9q4",
     square: 950,
     category_type: "Rent",
@@ -73,7 +90,7 @@ const properties = [
   {
     title: "Luxury Villa with Private Garden",
     description:
-      "This luxury villa in Bangalore balances elegant architecture with practical living...",
+      "Bangalore villa with a functional plan and private garden suited to daily use and seasonal entertaining. The ground floor includes living, dining, powder room, and a kitchen with island or breakfast counter. Large openings enhance light, ventilation, and views. Upper levels offer a primary suite with wardrobe wall and seating, plus secondary bedrooms for family or guests. Ensuite baths use modern fittings with effective ventilation. A first-floor family area supports media or study. Provision for multi-car parking, home automation, security, and high-speed internet improves usability. Close to schools, healthcare, retail, and business corridors, the home balances representational spaces with durable everyday functionality.",
     location: "Bangalore, Karnataka",
     country: "India",
     stateName: "Karnataka",
@@ -83,8 +100,19 @@ const properties = [
     propertyType: "Villa",
     images: ["/images/img.jpg"],
     rating: 4.8,
-    amenities: ["Clubhouse", "Pool", "Gym", "EV Charging"],
-    videoUrl: "https://www.youtube.com/watch?v=FA6mSHPM5z8&list=PLUs62aqkjy8lFWZON72434Sf4kXVAHdzk&index=8",
+    amenities: [
+      "Clubhouse",
+      "Pool",
+      "Gym",
+      "EV Charging",
+      "Landscaped Garden",
+      "Home Automation Ready",
+      "24x7 Security",
+      "CCTV Perimeter",
+      "Rainwater Harvesting"
+    ],
+    videoUrl:
+      "https://www.youtube.com/watch?v=FA6mSHPM5z8&list=PLUs62aqkjy8lFWZON72434Sf4kXVAHdzk&index=8",
     square: 3200,
     category_type: "Residential",
     brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
@@ -92,7 +120,7 @@ const properties = [
   {
     title: "Commercial Space on MG Road",
     description:
-      "Position your brand at a landmark address with this versatile commercial space on MG Road...",
+      "MG Road commercial unit with rectangular floor plate for flexible fit-outs: open office, cabinised consulting, or retail display grids. Generous frontage supports signage; glazing improves daylight and visibility. Lift and stair cores aid circulation; nearby parking supports short and medium-stay visits. Electrical backbone accommodates POS, desktops, and display lighting; backup in common areas aids continuity. CCTV in shared zones, structured access, and fire safety improve compliance. Surrounded by banks, eateries, and transit, the address brings reliable footfall and staff access. HVAC provisioning and ceiling grids simplify climate and lighting design. A rational platform for brands seeking visibility and operational predictability.",
     location: "Bangalore, Karnataka",
     country: "India",
     stateName: "Karnataka",
@@ -102,7 +130,16 @@ const properties = [
     propertyType: "Commercial property",
     images: ["/images/s.jpg"],
     rating: 4.2,
-    amenities: ["Power Backup", "Visitor Parking"],
+    amenities: [
+      "Power Backup",
+      "Visitor Parking",
+      "CCTV",
+      "Fire Safety System",
+      "High Footfall Location",
+      "Elevator Access",
+      "Signage Opportunity",
+      "Server/Network Ready"
+    ],
     videoUrl: "https://www.youtube.com/watch?v=lpzEd8gpWVM",
     square: 2200,
     category_type: "Commercial",
@@ -111,7 +148,7 @@ const properties = [
   {
     title: "Independent House near Leela Mahal Circle",
     description:
-      "A thoughtfully renovated independent house near Leela Mahal Circle...",
+      "Independent house near Leela Mahal Circle in a mature neighbourhood. Front setback allows a sit-out or planting strip. Ground floor provides living, dining, and a ventilated kitchen with clear work zones. Bedrooms accommodate wardrobes and study tables without obstructing movement. Bathrooms use robust, low-maintenance finishes. Cross-ventilation helps regulate indoor temperature. Parking suits a car and two-wheelers; street width usually enables easy manoeuvring. Essentials—retail, medical shops, schools, and transport—are nearby, reducing errand time. Electrical distribution supports typical appliances, and water is available via municipal and borewell sources. A practical choice for families preferring independence and for investors seeking stable, end-user demand.",
     location: "Tirupati",
     country: "India",
     stateName: "Andhra Pradesh",
@@ -121,7 +158,17 @@ const properties = [
     propertyType: "House",
     images: ["/images/five.jpg"],
     rating: 4.3,
-    amenities: ["Car Parking", "Borewell", "Solar Water Heater"],
+    amenities: [
+      "Car Parking",
+      "Borewell",
+      "Solar Water Heater",
+      "Compound Wall",
+      "CCTV Ready Wiring",
+      "Rainwater Harvesting",
+      "Study/Work Nook Provision",
+      "Water Storage Tanks",
+      "LED Lighting"
+    ],
     videoUrl: "https://www.youtube.com/watch?v=FTGkCx46L3w",
     square: 1800,
     category_type: "Sale",
@@ -130,7 +177,7 @@ const properties = [
   {
     title: "Plug & Play Office",
     description:
-      "Move in and get productive— this plug & play office in Hyderabad...",
+      "Hyderabad plug-and-play office designed to minimise setup time and maintain professional client interaction. Compact reception and waiting area lead to an open workstation bay sized for standard desks. Glass cabins preserve light while enabling privacy. A meeting room with display wall suits presentations and reviews. Server/IT closet secures network gear; pantry placement reduces disruption. Power and data points support varied seating charts; provision for UPS where needed. Common-area CCTV, elevator access, and backup for shared services aid continuity. Parking and nearby transit improve commuting. Ideal for startups or project pods seeking quick occupancy, branding opportunities, and predictable operating conditions.",
     location: "Hyderabad, Telangana",
     country: "India",
     stateName: "Telangana",
@@ -140,7 +187,17 @@ const properties = [
     propertyType: "Office Space",
     images: ["/images/six.jpg"],
     rating: 4.0,
-    amenities: ["Generator", "AC", "CCTV", "Parking"],
+    amenities: [
+      "Generator",
+      "AC",
+      "CCTV",
+      "Parking",
+      "Reception Area",
+      "Conference Room",
+      "Server Room",
+      "Access Control Ready",
+      "Housekeeping in Commons"
+    ],
     videoUrl: "https://www.youtube.com/watch?v=ec_fXMrD7Ow",
     square: 1400,
     category_type: "Lease",
@@ -149,7 +206,7 @@ const properties = [
   {
     title: "RERA Approved Condo",
     description:
-      "Experience community living done right in this RERA-approved condo in Chennai...",
+      "3BHK condo in a RERA-registered project in Chennai, planned for everyday usability and community support. Layout offers a contiguous living–dining zone with daylight, and bedrooms set back for privacy. The kitchen employs durable finishes, organised storage, and ventilation. Bathrooms feature anti-skid tiles and branded fittings. Master plan prioritises green pockets, walkability, and separation of vehicular and pedestrian movement. Clubhouse facilities include gym, indoor games, multipurpose hall, pool, and jogging track. Security uses controlled access and CCTV in common areas. Rainwater harvesting, waste segregation, and water treatment aid service stability. Close to schools, healthcare, retail, and transit—suitable for city upgraders and investors.",
     location: "Chennai, Tamil Nadu",
     country: "India",
     stateName: "Tamil Nadu",
@@ -159,7 +216,17 @@ const properties = [
     propertyType: "Condo",
     images: ["/images/seven.jpg"],
     rating: 4.6,
-    amenities: ["Pool", "Indoor Games", "Library", "Jogging Track"],
+    amenities: [
+      "Pool",
+      "Indoor Games",
+      "Library",
+      "Jogging Track",
+      "Clubhouse",
+      "24x7 Security",
+      "CCTV",
+      "Rainwater Harvesting",
+      "Sewage Treatment Plant"
+    ],
     videoUrl: "https://www.youtube.com/watch?v=wsQBs_QRexA",
     square: 1600,
     category_type: "Residential",
@@ -168,7 +235,7 @@ const properties = [
   {
     title: "Premium Plot in Gated Layout",
     description:
-      "Own a premium plot in a secure, well-planned gated layout off Renigunta Road...",
+      "Residential plot off Renigunta Road within a gated layout focused on controlled access, utilities, and legible streets. Wide internal roads enable two-way movement; plot demarcations and signage simplify planning. Street lighting and storm-water drainage improve evening and monsoon use. Green buffers and small parks support walking loops and micro-climate comfort. The format allows tailored setbacks, room sizes, and phased expansion subject to regulations. The address is close to schools, healthcare, retail, and public transport for convenient daily living. Suitable for self-use or investment, with low maintenance and appreciation potential linked to corridor growth and civic improvements. Conduct standard title and utility due diligence.",
     location: "Tirupati (Renigunta Road)",
     country: "India",
     stateName: "Andhra Pradesh",
@@ -178,7 +245,14 @@ const properties = [
     propertyType: "Land",
     images: ["/images/eight.jpg"],
     rating: 4.2,
-    amenities: ["Gated Entry", "Street Lights", "Drainage"],
+    amenities: [
+      "Gated Entry",
+      "Street Lights",
+      "Drainage",
+      "Security Cabin",
+      "Avenue Plantation",
+      "Internal Wide Roads"
+    ],
     videoUrl: "https://www.youtube.com/watch?v=IR_ZR5T2s9U",
     square: 2400,
     category_type: "Sale",
@@ -187,7 +261,7 @@ const properties = [
   {
     title: "Studio Apartment near IT Park",
     description:
-      "Compact, efficient, and easy to maintain— this studio apartment near Hyderabad’s IT Park...",
+      "Compact studio in Hyderabad’s tech corridor, optimised for low-maintenance living. Open plan supports a sofa-bed, two-seater dining, and study desk. The kitchenette consolidates essentials with overhead shelving and base cabinets. A ventilated bathroom with contemporary fittings simplifies cleaning. Daylight through the main opening reduces daytime lighting needs; at night, zoned LED fixtures offer task and ambient light. Building conveniences typically include lift access, secure entry, and CCTV in common areas. Broadband connectivity supports hybrid work and study. Steps from offices, cafes, groceries, gyms, and transit, the unit suits single occupants or students seeking affordability, proximity, and straightforward, lock-and-leave functionality.",
     location: "Hyderabad",
     country: "India",
     stateName: "Telangana",
@@ -197,13 +271,25 @@ const properties = [
     propertyType: "Studio",
     images: ["/images/five.jpg"],
     rating: 3.9,
-    amenities: ["Lift", "Security", "RO Water"],
+    amenities: [
+      "Lift",
+      "Security",
+      "RO Water",
+      "CCTV",
+      "Power Backup (Common Areas)",
+      "Broadband Ready",
+      "Bicycle Parking",
+      "Intercom",
+      "LED Corridor Lighting"
+    ],
     videoUrl: "https://www.youtube.com/watch?v=FTGkCx46L3w",
     square: 520,
     category_type: "Rent",
     brochureUrl: "/images/bodagalatownshiplayoutvenkatagiri.pdf",
   },
 ];
+
+
 
 
 

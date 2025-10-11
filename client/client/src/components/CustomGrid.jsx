@@ -20,7 +20,7 @@ const ICONS = {
 };
 
 export default function CustomGrid({
-  heroImg = "https://images.unsplash.com/photo-1494526585095-c41746248156?w=1600&q=80",
+  heroImg = "/images/imagerd.jpg",
 }) {
   const [features, setFeatures] = useState([]);
 
